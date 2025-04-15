@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Service | WashXpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Combined styles from both pages */
+        .service-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .service-card:hover, .service-card.selected {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-card.selected {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .time-slot {
+            transition: all 0.2s ease;
+        }
+        
+        .time-slot:hover, .time-slot.selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .plan-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+        }
+        
+        .popular-plan {
+            border: 2px solid #3b82f6;
+            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2);
+            position: relative;
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+        }
+        
+        .feature-item {
+            position: relative;
+            padding-left: 1.75rem;
+        }
+        
+        .feature-item:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.35rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%233b82f6'%3E%3Cpath fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+        }
+        
+        .nav-tab {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-tab.active {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .nav-tab.active:after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #3b82f6;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .confirmation-modal {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-gray-100">
+    <!-- Navigation (consistent with other pages) -->
+    <nav class="bg-gray-800 bg-opacity-90 backdrop-blur-md fixed w-full z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-blue-400">
+                    <span class="text-white">Wash</span>Xpress
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+                    <a href="index.html#services" class="hover:text-blue-400 transition">Services</a>
+                    <a href="index.html#locations" class="hover:text-blue-400 transition">Locations</a>
+                    <a href="login.html" class="hover:text-blue-400 transition">Login</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
+                <a href="index.html" class="block py-2 hover:text-blue-400 transition">Home</a>
+                <a href="index.html#services" class="block py-2 hover:text-blue-400 transition">Services</a>
+                <a href="index.html#locations" class="block py-2 hover:text-blue-400 transition">Locations</a>
+                <a href="login.html" class="block py-2 hover:text-blue-400 transition">Login</a>
+            </div>
+        </div>
+    </nav>
+
+   <!-- Main Content -->
+<main class="min-h-screen pt-24 pb-12 px-4">
+  <div class="container mx-auto max-w-5xl">
+      <div class="text-center mb-12">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+              Book Your Service
+          </h1>
+          <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+              Quick and easy booking for all your vehicle cleaning needs
+          </p>
+      </div>
+      
+      <!-- Navigation Tabs -->
+      <div class="flex border-b border-gray-700 mb-8">
+          <button class="nav-tab active px-6 py-3 text-lg" data-tab="single-service">
+              <i class="fas fa-calendar-day mr-2"></i> Service Booking
+          </button>
+      </div>
+      
+      <!-- Single Service Tab -->
+      <div id="single-service" class="tab-content active">
+          <!-- Simplified Progress Bar -->
+          <div class="mb-8">
+              <div class="flex justify-between text-sm text-gray-400 mb-2">
+                  <span>1. Personal Info</span>
+                  <span>2. Service & Time</span>
+              </div>
+              <div class="w-full bg-gray-700 rounded-full h-2">
+                  <div class="progress-bar rounded-full h-2 bg-blue-500" style="width: 33%"></div>
+              </div>
+          </div>
+          
+          <form id="booking-form" class="bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl shadow-2xl border border-gray-700 space-y-6">
+              <!-- Personal Info Section -->
+              <section id="personal-info">
+                  <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                      <span class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full mr-3">1</span>
+                      Personal Information
+                  </h2>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                          <label class="block text-gray-300 mb-2 font-medium">Full Name <span class="text-red-500">*</span></label>
+                          <div class="relative">
+                              <i class="fas fa-user absolute left-3 top-3 text-gray-500"></i>
+                              <input type="text" placeholder="pema dorji" required
+                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                      </div>
+                      
+                      <div>
+                          <label class="block text-gray-300 mb-2 font-medium">Phone Number <span class="text-red-500">*</span></label>
+                          <div class="relative">
+                              <i class="fas fa-phone absolute left-3 top-3 text-gray-500"></i>
+                              <input type="tel" placeholder="+975 XXXXXXXX" required
+                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                      </div>
+                      
+                      <div>
+                          <label class="block text-gray-300 mb-2 font-medium">Email</label>
+                          <div class="relative">
+                              <i class="fas fa-envelope absolute left-3 top-3 text-gray-500"></i>
+                              <input type="email" placeholder="your@mail.com"
+                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                      </div>
+                      
+                      <div>
+                          <label class="block text-gray-300 mb-2 font-medium">Vehicle Type <span class="text-red-500">*</span></label>
+                          <div class="relative">
+                              <i class="fas fa-car absolute left-3 top-3 text-gray-500"></i>
+                              <select required class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                  <option value="">Select your vehicle</option>
+                                  <option>Car</option>
+                                  <option>SUV/Truck</option>
+                                  <option>Motorcycle</option>
+                                  <option>Bicycle</option>
+                                  <option>Other</option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="flex justify-end mt-8">
+                      <button type="button" onclick="nextSection('personal-info', 'service-selection')" 
+                              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-300 flex items-center">
+                          Next: Select Service <i class="fas fa-arrow-right ml-2"></i>
+                      </button>
+                  </div>
+              </section>
+              
+              <!-- Service Selection Section -->
+              <section id="service-selection" class="hidden">
+                  <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                      <span class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full mr-3">2</span>
+                      Service & Time Selection
+                  </h2>
+                  
+                  <div class="mb-8">
+                      <h3 class="text-xl font-medium mb-4 text-gray-300">Choose Your Service</h3>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <!-- Basic Wash -->
+                          <div class="service-card p-5 rounded-lg bg-gray-700 cursor-pointer">
+                              <div class="flex justify-between items-start mb-3">
+                                  <h4 class="font-semibold text-lg">Basic Wash</h4>
+                                  <span class="bg-blue-600 text-xs px-2 py-1 rounded">From Nu.150</span>
+                              </div>
+                              <p class="text-gray-400 text-sm mb-3">Essential exterior cleaning</p>
+                              <ul class="text-gray-400 text-xs space-y-1">
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Exterior hand wash</li>
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Wheel cleaning</li>
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Quick interior vacuum</li>
+                              </ul>
+                          </div>
+                          
+                          <!-- Premium Wash -->
+                          <div class="service-card p-5 rounded-lg bg-gray-700 cursor-pointer">
+                              <div class="flex justify-between items-start mb-3">
+                                  <h4 class="font-semibold text-lg">Premium Wash</h4>
+                                  <span class="bg-blue-600 text-xs px-2 py-1 rounded">From Nu.600</span>
+                              </div>
+                              <p class="text-gray-400 text-sm mb-3">Complete exterior and interior</p>
+                              <ul class="text-gray-400 text-xs space-y-1">
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Everything in Basic</li>
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Wax application</li>
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Interior wipe down</li>
+                              </ul>
+                          </div>
+                          
+                          <!-- Full Detailing -->
+                          <div class="service-card p-5 rounded-lg bg-gray-700 cursor-pointer">
+                              <div class="flex justify-between items-start mb-3">
+                                  <h4 class="font-semibold text-lg">Full Detailing</h4>
+                                  <span class="bg-blue-600 text-xs px-2 py-1 rounded">From Nu.1200</span>
+                              </div>
+                              <p class="text-gray-400 text-sm mb-3">Professional detailing</p>
+                              <ul class="text-gray-400 text-xs space-y-1">
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Everything in Premium</li>
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Clay bar treatment</li>
+                                  <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Leather conditioning</li>
+                              </ul>
+                          </div>
+                          <div class="service-card p-5 rounded-lg bg-gray-700 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <h4 class="font-semibold text-lg">Others</h4>
+                                <span class="bg-blue-600 text-xs px-2 py-1 rounded">Price on Arrival</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-3">Other services Available</p>
+                            <ul class="text-gray-400 text-xs space-y-1">
+                                <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Patiently waiting for you</li>
+                                <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Service as per request</li>
+                                <li><i class="fas fa-check-circle text-blue-400 mr-1"></i> Flexible</li>
+                            </ul>
+                        </div>
+                      </div>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                          <label class="block text-gray-300 mb-2 font-medium">Preferred Date <span class="text-red-500">*</span></label>
+                          <div class="relative">
+                              <i class="fas fa-calendar-day absolute left-3 top-3 text-gray-500"></i>
+                              <input type="date" required
+                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          </div>
+                      </div>
+                      
+                      <div>
+                          <label class="block text-gray-300 mb-2 font-medium">Time Slot <span class="text-red-500">*</span></label>
+                          <div class="grid grid-cols-2 gap-2">
+                              <div class="time-slot text-center py-2 rounded bg-gray-700 cursor-pointer">8:00 - 10:00</div>
+                              <div class="time-slot text-center py-2 rounded bg-gray-700 cursor-pointer">10:00 - 12:00</div>
+                              <div class="time-slot text-center py-2 rounded bg-gray-700 cursor-pointer">12:00 - 14:00</div>
+                              <div class="time-slot text-center py-2 rounded bg-gray-700 cursor-pointer">14:00 - 16:00</div>
+                              <div class="time-slot text-center py-2 rounded bg-gray-700 cursor-pointer">16:00 - 18:00</div>
+                              <div class="time-slot text-center py-2 rounded bg-gray-700 cursor-pointer">18:00 - 20:00</div>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  <div class="mt-6">
+                      <label class="block text-gray-300 mb-2 font-medium">Special Requests</label>
+                      <textarea rows="3" placeholder="Any special instructions..." 
+                                class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                  </div>
+                  
+                  <div class="flex justify-between mt-8">
+                      <button type="button" onclick="prevSection('service-selection', 'personal-info')" 
+                              class="bg-gray-600 hover:bg-gray-500 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                          <i class="fas fa-arrow-left mr-2"></i> Back
+                      </button>
+                      <button type="submit" 
+                              class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition duration-300 transform hover:scale-105 flex items-center">
+                          <i class="fas fa-calendar-check mr-2"></i> Book Now
+                      </button>
+                  </div>
+              </section>
+          </form>
+      </div>
+  </div>
+</main>
+
+<!-- Success Notification (replaces modal) -->
+<div id="success-notification" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg hidden z-50">
+  <div class="flex items-center">
+      <i class="fas fa-check-circle mr-2"></i>
+      <span>Booking confirmed! We'll see you soon.</span>
+  </div>
+</div>
+
+
+    <!-- Footer (consistent with other pages) -->
+    <footer class="bg-[#2B2B29] text-gray-300 pt-12 pb-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Company Info -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-car text-blue-500 text-2xl"></i>
+                        <span class="text-xl font-bold text-white">WashXpress</span>
+                    </div>
+                    <p class="mb-4">
+                        Premium car washing services for individuals and fleets.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-twitter text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-linkedin-in text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="index.html" class="hover:text-blue-500 transition-colors">Home</a>
+                        </li>
+                        <li>
+                            <a href="index.html#services" class="hover:text-blue-500 transition-colors">Services</a>
+                        </li>
+                        <li>
+                            <a href="booking.html" class="text-blue-500">Book Service</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-map-marker-alt text-blue-500 mt-1"></i>
+                            <span>C-B-22 Road, Main Street, Phuentsholing</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-phone text-blue-500"></i>
+                            <span>(+175) 77884488</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-blue-500"></i>
+                            <span>supportTeam@washXpress.com</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Newsletter</h3>
+                    <p class="mb-4">Subscribe for offers and updates</p>
+                    <form class="flex gap-2">
+                        <input 
+                            type="email" 
+                            placeholder="Your email" 
+                            class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
+                        />
+                        <button 
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                        >
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-gray-700 pt-6 text-center text-gray-500">
+                <p>&copy; <span id="year"></span> WashXpress. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu) {
+                    mobileMenu.classList.toggle('hidden');
+                }
+            });
+        }
+        
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Form elements
+        const bookingForm = document.getElementById('booking-form');
+        const fullNameInput = bookingForm.querySelector('input[type="text"]');
+        const phoneInput = bookingForm.querySelector('input[type="tel"]');
+        const emailInput = bookingForm.querySelector('input[type="email"]');
+        const vehicleSelect = bookingForm.querySelector('select');
+        const dateInput = bookingForm.querySelector('input[type="date"]');
+        
+        // Service card selection
+        const serviceCards = document.querySelectorAll('.service-card');
+        serviceCards.forEach(card => {
+            card.addEventListener('click', () => {
+                serviceCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+        
+        // Time slot selection
+        const timeSlots = document.querySelectorAll('.time-slot');
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', () => {
+                timeSlots.forEach(s => s.classList.remove('selected'));
+                slot.classList.add('selected');
+            });
+        });
+        
+        // Validate phone number format
+        function validatePhoneNumber(phone) {
+            const phoneRegex = /^\+?[0-9]{8,15}$/;
+            return phoneRegex.test(phone);
+        }
+        
+        // Validate email format
+        function validateEmail(email) {
+            if (!email) return true; // Email is optional
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        // Validate date is not in the past
+        function validateDate(date) {
+            if (!date) return false;
+            const selectedDate = new Date(date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return selectedDate >= today;
+        }
+        
+        // Show error message for a field
+        function showError(input, message) {
+            const formControl = input.parentElement;
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-red-500 text-sm mt-1';
+            errorDiv.textContent = message;
+            
+            // Remove existing error if any
+            const existingError = formControl.querySelector('.text-red-500');
+            if (existingError) {
+                formControl.removeChild(existingError);
+            }
+            
+            formControl.appendChild(errorDiv);
+            input.classList.add('border-red-500');
+            input.classList.remove('border-gray-700');
+        }
+        
+        // Clear error message for a field
+        function clearError(input) {
+            const formControl = input.parentElement;
+            const errorDiv = formControl.querySelector('.text-red-500');
+            if (errorDiv) {
+                formControl.removeChild(errorDiv);
+            }
+            input.classList.remove('border-red-500');
+            input.classList.add('border-gray-700');
+        }
+        
+        // Validate personal info section
+        function validatePersonalInfo() {
+            let isValid = true;
+            
+            // Validate full name
+            if (!fullNameInput.value.trim()) {
+                showError(fullNameInput, 'Full name is required');
+                isValid = false;
+            } else {
+                clearError(fullNameInput);
+            }
+            
+            // Validate phone number
+            if (!phoneInput.value.trim()) {
+                showError(phoneInput, 'Phone number is required');
+                isValid = false;
+            } else if (!validatePhoneNumber(phoneInput.value.trim())) {
+                showError(phoneInput, 'Please enter a valid phone number');
+                isValid = false;
+            } else {
+                clearError(phoneInput);
+            }
+            
+            // Validate email (optional)
+            if (emailInput.value.trim() && !validateEmail(emailInput.value.trim())) {
+                showError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError(emailInput);
+            }
+            
+            // Validate vehicle type
+            if (!vehicleSelect.value) {
+                showError(vehicleSelect, 'Please select your vehicle type');
+                isValid = false;
+            } else {
+                clearError(vehicleSelect);
+            }
+            
+            return isValid;
+        }
+        
+        // Validate service selection section
+        function validateServiceSelection() {
+            let isValid = true;
+            
+            // Check if a service is selected
+            const selectedService = document.querySelector('.service-card.selected');
+            if (!selectedService) {
+                // Show error near service cards
+                const serviceContainer = document.querySelector('#service-selection > div:first-child');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-red-500 text-sm mt-2';
+                errorDiv.textContent = 'Please select a service';
+                
+                // Remove existing error if any
+                const existingError = serviceContainer.querySelector('.text-red-500');
+                if (existingError) {
+                    serviceContainer.removeChild(existingError);
+                }
+                
+                serviceContainer.appendChild(errorDiv);
+                isValid = false;
+            }
+            
+            // Validate date
+            if (!dateInput.value) {
+                showError(dateInput, 'Please select a date');
+                isValid = false;
+            } else if (!validateDate(dateInput.value)) {
+                showError(dateInput, 'Please select a future date');
+                isValid = false;
+            } else {
+                clearError(dateInput);
+            }
+            
+            // Check if a time slot is selected
+            const selectedTimeSlot = document.querySelector('.time-slot.selected');
+            if (!selectedTimeSlot) {
+                // Show error near time slots
+                const timeSlotContainer = document.querySelector('#service-selection > div:last-child > div:last-child');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-red-500 text-sm mt-2';
+                errorDiv.textContent = 'Please select a time slot';
+                
+                // Remove existing error if any
+                const existingError = timeSlotContainer.querySelector('.text-red-500');
+                if (existingError) {
+                    timeSlotContainer.removeChild(existingError);
+                }
+                
+                timeSlotContainer.appendChild(errorDiv);
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // service booking form navigation
+        function nextSection(currentId, nextId) {
+            if (currentId === 'personal-info' && !validatePersonalInfo()) {
+                return; // Don't proceed if validation fails
+            }
+            
+            if (currentId === 'service-selection' && !validateServiceSelection()) {
+                return; // Don't proceed if validation fails
+            }
+            
+            document.getElementById(currentId).classList.add('hidden');
+            document.getElementById(nextId).classList.remove('hidden');
+            
+            // Update progress bar
+            if (nextId === 'service-selection') {
+                document.querySelector('.progress-bar').style.width = '66%';
+            } else if (nextId === 'additional-info') {
+                document.querySelector('.progress-bar').style.width = '100%';
+            }
+            
+            // Scroll to top of the section for better UX
+            document.getElementById(nextId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        function prevSection(currentId, prevId) {
+            document.getElementById(currentId).classList.add('hidden');
+            document.getElementById(prevId).classList.remove('hidden');
+            
+            // Update progress bar
+            if (prevId === 'personal-info') {
+                document.querySelector('.progress-bar').style.width = '33%';
+            } else if (prevId === 'service-selection') {
+                document.querySelector('.progress-bar').style.width = '66%';
+            }
+            
+            // Scroll to top of the section for better UX
+            document.getElementById(prevId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Form submission
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate all sections before submission
+            if (!validatePersonalInfo() || !validateServiceSelection()) {
+                // Show error notification if validation fails
+                const notification = document.getElementById('success-notification');
+                notification.classList.remove('bg-green-600', 'hidden');
+                notification.classList.add('bg-red-600');
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        <span>Please fill all required fields correctly.</span>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                    notification.classList.remove('bg-red-600');
+                    notification.classList.add('bg-green-600');
+                }, 5000);
+                return;
+            }
+            
+            // Show success notification
+            const notification = document.getElementById('success-notification');
+            notification.classList.remove('hidden');
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>Booking confirmed! We'll see you soon.</span>
+                </div>
+            `;
+            
+            // Reset form after successful submission
+            setTimeout(() => {
+                notification.classList.add('hidden');
+                
+                // Reset form
+                bookingForm.reset();
+                serviceCards.forEach(c => c.classList.remove('selected'));
+                timeSlots.forEach(s => s.classList.remove('selected'));
+                
+                // Go back to first section
+                document.querySelectorAll('section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.getElementById('personal-info').classList.remove('hidden');
+                document.querySelector('.progress-bar').style.width = '33%';
+                
+                // Clear all errors
+                document.querySelectorAll('.text-red-500').forEach(error => error.remove());
+                document.querySelectorAll('.border-red-500').forEach(input => {
+                    input.classList.remove('border-red-500');
+                    input.classList.add('border-gray-700');
+                });
+            }, 5000);
+            
+            // Here you would typically send the form data to the server
+            // For demonstration, we'll just log it
+            const formData = {
+                name: fullNameInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                email: emailInput.value.trim(),
+                vehicle: vehicleSelect.value,
+                service: document.querySelector('.service-card.selected h4').textContent,
+                date: dateInput.value,
+                time: document.querySelector('.time-slot.selected').textContent.trim(),
+                specialRequests: bookingForm.querySelector('textarea').value.trim()
+            };
+            console.log('Form data:', formData);
+        });
+        
+        // Add input event listeners for real-time validation
+        fullNameInput.addEventListener('input', () => {
+            if (fullNameInput.value.trim()) {
+                clearError(fullNameInput);
+            }
+        });
+        
+        phoneInput.addEventListener('input', () => {
+            if (phoneInput.value.trim() && validatePhoneNumber(phoneInput.value.trim())) {
+                clearError(phoneInput);
+            }
+        });
+        
+        emailInput.addEventListener('input', () => {
+            if (!emailInput.value.trim() || validateEmail(emailInput.value.trim())) {
+                clearError(emailInput);
+            }
+        });
+        
+        vehicleSelect.addEventListener('change', () => {
+            if (vehicleSelect.value) {
+                clearError(vehicleSelect);
+            }
+        });
+        
+        dateInput.addEventListener('change', () => {
+            if (dateInput.value && validateDate(dateInput.value)) {
+                clearError(dateInput);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard | WashXpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .dashboard-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        
+        .active-tab {
+            position: relative;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .active-tab:after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #3b82f6;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        
+        .badge-primary {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        
+        .badge-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .badge-warning {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background-color: #3b82f6;
+            transition: width 0.5s ease;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(59, 130, 246, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 bg-opacity-90 backdrop-blur-md fixed w-full z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-blue-400">
+                    <span class="text-white">Wash</span>Xpress
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+                    <a href="booking.html" class="hover:text-blue-400 transition">Book Now</a>
+                    <a href="dashboard.html" class="text-blue-400 font-semibold">Dashboard</a>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-1 focus:outline-none">
+                            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                                <span>JP</span>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm text-gray-400"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+                            <a href="dashboard.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">My Account</a>
+                            <a href="dashboard.html#settings" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Settings</a>
+                            <a href="login.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Sign Out</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4">
+                <a href="index.html" class="block py-2 hover:text-blue-400 transition">Home</a>
+                <a href="booking.html" class="block py-2 hover:text-blue-400 transition">Book Now</a>
+                <a href="dashboard.html" class="block py-2 text-blue-400">Dashboard</a>
+                <a href="dashboard.html#settings" class="block py-2 hover:text-blue-400 transition">Settings</a>
+                <a href="login.html" class="block py-2 hover:text-blue-400 transition">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="pt-24 pb-12 min-h-screen">
+        <div class="container mx-auto px-4">
+            <!-- Dashboard Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2">Welcome back, Jigme</h1>
+                    <p class="text-gray-400">Here's what's happening with your WashXpress account</p>
+                </div>
+                <a href="booking.html" class="mt-4 md:mt-0 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i> New Booking
+                </a>
+            </div>
+            
+            <!-- Dashboard Tabs -->
+            <div class="flex border-b border-gray-700 mb-8">
+                <a href="#overview" class="active-tab px-4 py-3">Overview</a>
+                <a href="#bookings" class="px-4 py-3 hover:text-blue-400 transition">Bookings</a>
+            </div>
+            
+            <!-- Overview Section -->
+            <section id="overview" class="dashboard-section">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Account Summary -->
+                    <div class="dashboard-card bg-gray-800 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-user-circle mr-2 text-blue-400"></i>
+                            Account Summary
+                        </h2>
+                        <div class="flex flex-col items-center mb-4">
+                            <div class="avatar rounded-full flex items-center justify-center mb-3">
+                                <span class="text-2xl font-bold">JP</span>
+                            </div>
+                            <h3 class="text-lg font-semibold">Jigme Pema</h3>
+                            <p class="text-gray-400 text-sm">Member since June 2023</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Email:</span>
+                                <span>jigme.pema@example.com</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Phone:</span>
+                                <span>+975 77 123 456</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Member Status:</span>
+                                <span class="text-blue-400 font-medium">Premium</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upcoming Booking -->
+                    <div class="dashboard-card bg-gray-800 rounded-xl p-6">
+                        <h2 class="text-xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-calendar-check mr-2 text-blue-400"></i>
+                            Upcoming Booking
+                        </h2>
+                        <div class="bg-gray-700 rounded-lg p-4 mb-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold">Premium Wash</h3>
+                                <span class="badge badge-success">Confirmed</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-400 mb-1">
+                                <span><i class="fas fa-car mr-1"></i> Toyota Hilux</span>
+                                <span><i class="fas fa-tag mr-1"></i> Nu.600</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-400">
+                                <span><i class="fas fa-calendar-day mr-1"></i> 12 July 2023</span>
+                                <span><i class="fas fa-clock mr-1"></i> 10:00 - 12:00</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="#" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded text-center text-sm transition">
+                                <i class="fas fa-edit mr-1"></i> Modify
+                            </a>
+                            <a href="#" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded text-center text-sm transition">
+                                <i class="fas fa-times mr-1"></i> Cancel
+                            </a>
+                        </div>
+                        <a href="#bookings" class="block text-center text-blue-400 hover:text-blue-300 mt-4 text-sm">
+                            View All Bookings <i class="fas fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="dashboard-card bg-gray-800 rounded-xl p-6 mb-8">
+                    <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href="booking.html" class="bg-gray-700 hover:bg-gray-600 p-4 rounded-lg text-center transition">
+                            <div class="text-blue-400 text-2xl mb-2">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                            <span class="text-sm">New Booking</span>
+                        </a>
+                        <a href="index.html#contact" class="bg-gray-700 hover:bg-gray-600 p-4 rounded-lg text-center transition">
+                            <div class="text-blue-400 text-2xl mb-2">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <span class="text-sm">Get Help</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Bookings Section -->
+            <section id="bookings" class="dashboard-section hidden">
+                <div class="dashboard-card bg-gray-800 rounded-xl p-6 mb-6">
+                    <h2 class="text-xl font-bold mb-4">My Bookings</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-700">
+                                <tr>
+                                    <th class="py-3 px-4 text-left">Service</th>
+                                    <th class="py-3 px-4 text-left">Vehicle</th>
+                                    <th class="py-3 px-4 text-left">Date & Time</th>
+                                    <th class="py-3 px-4 text-left">Amount</th>
+                                    <th class="py-3 px-4 text-left">Status</th>
+                                    <th class="py-3 px-4 text-left">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                <tr>
+                                    <td class="py-3 px-4">Premium Wash</td>
+                                    <td class="py-3 px-4">Toyota Hilux</td>
+                                    <td class="py-3 px-4">12 Jul 2023, 10:00-12:00</td>
+                                    <td class="py-3 px-4">Nu.600</td>
+                                    <td class="py-3 px-4"><span class="badge badge-success">Confirmed</span></td>
+                                    <td class="py-3 px-4">
+                                        <a href="#" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fas fa-edit"></i></a>
+                                        <a href="#" class="text-red-400 hover:text-red-300"><i class="fas fa-times"></i></a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4">Basic Wash</td>
+                                    <td class="py-3 px-4">Toyota Hilux</td>
+                                    <td class="py-3 px-4">28 Jun 2023, 14:00-16:00</td>
+                                    <td class="py-3 px-4">Nu.150</td>
+                                    <td class="py-3 px-4"><span class="badge badge-success">Completed</span></td>
+                                    <td class="py-3 px-4">
+                                        <a href="#" class="text-blue-400 hover:text-blue-300"><i class="fas fa-redo"></i></a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4">Full Detailing</td>
+                                    <td class="py-3 px-4">Toyota Hilux</td>
+                                    <td class="py-3 px-4">15 Jun 2023, 09:00-12:00</td>
+                                    <td class="py-3 px-4">Nu.1200</td>
+                                    <td class="py-3 px-4"><span class="badge badge-success">Completed</span></td>
+                                    <td class="py-3 px-4">
+                                        <a href="#" class="text-blue-400 hover:text-blue-300"><i class="fas fa-redo"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#2B2B29] text-gray-300 pt-12 pb-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Company Info -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fas fa-car text-blue-500 text-2xl"></i>
+                        <span class="text-xl font-bold text-white">WashXpress</span>
+                    </div>
+                    <p class="mb-4">
+                        Premium car washing services for individuals and fleets.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-twitter text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
+                            <i class="fab fa-linkedin-in text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="index.html" class="hover:text-blue-500 transition-colors">Home</a>
+                        </li>
+                        <li>
+                            <a href="booking.html" class="hover:text-blue-500 transition-colors">Book Service</a>
+                        </li>
+                        <li>
+                            <a href="dashboard.html" class="text-blue-500">Dashboard</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-map-marker-alt text-blue-500 mt-1"></i>
+                            <span>C-B-22 Road, Main Street, Phuentsholing</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-phone text-blue-500"></i>
+                            <span>(+175) 77884488</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-blue-500"></i>
+                            <span>supportTeam@washXpress.com</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Newsletter</h3>
+                    <p class="mb-4">Subscribe for offers and updates</p>
+                    <form class="flex gap-2">
+                        <input 
+                            type="email" 
+                            placeholder="Your email" 
+                            class="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 flex-1"
+                        />
+                        <button 
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                        >
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-gray-700 pt-6 text-center text-gray-500">
+                <p>&copy; <span id="year"></span> WashXpress. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        if (mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu) {
+                    mobileMenu.classList.toggle('hidden');
+                }
+            });
+        }
+        
+        // Dashboard tab navigation
+        const dashboardTabs = document.querySelectorAll('.dashboard-section');
+        const navTabs = document.querySelectorAll('.border-b a');
+        
+        // Show the section based on URL hash or default to overview
+        function showSection() {
+            const hash = window.location.hash || '#overview';
+            
+            // Hide all sections
+            dashboardTabs.forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav tabs
+            navTabs.forEach(tab => {
+                tab.classList.remove('active-tab');
+            });
+            
+            // Show the selected section and mark tab as active
+            const activeSection = document.querySelector(hash);
+            const activeTab = document.querySelector(`a[href="${hash}"]`);
+            
+            if (activeSection) {
+                activeSection.classList.remove('hidden');
+            }
+            
+            if (activeTab) {
+                activeTab.classList.add('active-tab');
+            }
+        }
+        
+        // Initial load
+        showSection();
+        
+        // Handle back/forward navigation
+        window.addEventListener('hashchange', showSection);
+        
+        // Click handler for nav tabs
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const hash = tab.getAttribute('href');
+                
+                // Update URL without page reload
+                history.pushState(null, null, hash);
+                
+                // Show the corresponding section
+                showSection();
+            });
+        });
+        
+        // Sample data for charts (would be replaced with real data in production)
+        const washUsageData = {
+            labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
+            data: [3, 5, 6, 4, 7, 8]
+        };
+    </script>
+</body>
+</html>

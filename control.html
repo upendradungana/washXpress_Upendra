@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Center | WashXpress</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        .status-completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        .table-row:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .active-tab {
+            color: #3b82f6;
+            font-weight: 600;
+            border-bottom: 2px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- Top Navigation -->
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-xl font-bold text-blue-400">
+                        <span class="text-white">Wash</span>Xpress
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="login.html" class="text-blue-400 hover:text-blue-300">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Control Center Dashboard -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Dashboard Header -->
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">
+                <i class="fas fa-tachometer-alt text-blue-400 mr-2"></i>
+                Booking Control Center
+            </h1>
+            <p class="text-gray-400">Today: <span id="current-date"></span></p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Today's Bookings</p>
+                        <p class="text-2xl font-bold" id="total-bookings">3</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Pending</p>
+                        <p class="text-2xl font-bold" id="pending-count">1</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-800 rounded-lg p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-400 text-sm">Completed</p>
+                        <p class="text-2xl font-bold" id="completed-count">2</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-700 mb-4">
+            <button class="tab-btn px-4 py-2 active-tab" data-tab="pending-tab">Pending</button>
+            <button class="tab-btn px-4 py-2" data-tab="completed-tab">Completed</button>
+        </div>
+
+        <!-- Pending Bookings Tab -->
+        <div id="pending-tab" class="tab-content active">
+            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg mb-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Booking ID</th>
+                                <th class="py-3 px-4 text-left">Customer</th>
+                                <th class="py-3 px-4 text-left">Vehicle</th>
+                                <th class="py-3 px-4 text-left">Service</th>
+                                <th class="py-3 px-4 text-left">Time</th>
+                                <th class="py-3 px-4 text-left">Status</th>
+                                <th class="py-3 px-4 text-left">Mark Done</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700" id="pending-bookings">
+                            <!-- Pending bookings will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Bookings Tab -->
+        <div id="completed-tab" class="tab-content">
+            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg mb-6">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Booking ID</th>
+                                <th class="py-3 px-4 text-left">Customer</th>
+                                <th class="py-3 px-4 text-left">Vehicle</th>
+                                <th class="py-3 px-4 text-left">Service</th>
+                                <th class="py-3 px-4 text-left">Time</th>
+                                <th class="py-3 px-4 text-left">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700" id="completed-bookings">
+                            <!-- Completed bookings will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample booking data
+        const bookings = [
+            {
+                id: "WX-2023-156",
+                customer: "Jigme Pema",
+                email: "jigme.pema@example.com",
+                vehicle: "Toyota Hilux",
+                plate: "BL-1234",
+                service: "Premium Wash",
+                price: "Nu.600",
+                time: "10:00 - 12:00",
+                status: "pending",
+                phone: "+975 77 123 456"
+            },
+            {
+                id: "WX-2023-154",
+                customer: "Lhamo Dorji",
+                email: "lhamo.dorji@example.com",
+                vehicle: "Honda Civic",
+                plate: "BT-5678",
+                service: "Basic Wash",
+                price: "Nu.150",
+                time: "14:00 - 16:00",
+                status: "completed",
+                phone: "+975 77 234 567"
+            },
+            {
+                id: "WX-2023-153",
+                customer: "Dawa Tshering",
+                email: "dawa.tshering@example.com",
+                vehicle: "Hyundai Creta",
+                plate: "BTP-1122",
+                service: "Full Detailing",
+                price: "Nu.1200",
+                time: "09:00 - 12:00",
+                status: "completed",
+                phone: "+975 77 345 678"
+            }
+        ];
+
+        // Set current date
+        const now = new Date();
+        document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Render bookings
+        function renderBookings() {
+            const pendingContainer = document.getElementById('pending-bookings');
+            const completedContainer = document.getElementById('completed-bookings');
+            
+            pendingContainer.innerHTML = '';
+            completedContainer.innerHTML = '';
+            
+            let pendingCount = 0;
+            let completedCount = 0;
+
+            bookings.forEach(booking => {
+                if (booking.status === 'pending') {
+                    pendingCount++;
+                    pendingContainer.innerHTML += `
+                        <tr class="table-row" data-id="${booking.id}">
+                            <td class="py-3 px-4">#${booking.id}</td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium">${booking.customer}</div>
+                                <div class="text-sm text-gray-400">${booking.email}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div>${booking.vehicle}</div>
+                                <div class="text-sm text-gray-400">${booking.plate}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge ${booking.service === 'Full Detailing' ? 'bg-purple-900 text-purple-400' : 'bg-blue-900 text-blue-400'}">${booking.service}</span>
+                                <div class="text-sm text-gray-400">${booking.price}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="text-sm">${booking.time}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge status-pending">Pending</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="complete-checkbox form-checkbox h-4 w-4 text-blue-600">
+                                    <span class="ml-2 text-sm">Done</span>
+                                </label>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    completedCount++;
+                    completedContainer.innerHTML += `
+                        <tr class="table-row">
+                            <td class="py-3 px-4">#${booking.id}</td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium">${booking.customer}</div>
+                                <div class="text-sm text-gray-400">${booking.email}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div>${booking.vehicle}</div>
+                                <div class="text-sm text-gray-400">${booking.plate}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge ${booking.service === 'Full Detailing' ? 'bg-purple-900 text-purple-400' : 'bg-blue-900 text-blue-400'}">${booking.service}</span>
+                                <div class="text-sm text-gray-400">${booking.price}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="text-sm">${booking.time}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="badge status-completed">Completed</span>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            // Update counters
+            document.getElementById('total-bookings').textContent = bookings.length;
+            document.getElementById('pending-count').textContent = pendingCount;
+            document.getElementById('completed-count').textContent = completedCount;
+        }
+
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active-tab'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active-tab');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Handle checkbox changes (event delegation)
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('complete-checkbox')) {
+                const row = e.target.closest('tr');
+                const bookingId = row.getAttribute('data-id');
+                
+                // Find the booking in our array
+                const booking = bookings.find(b => b.id === bookingId);
+                if (booking) {
+                    booking.status = 'completed';
+                    renderBookings();
+                    // Switch to completed tab to see the change
+                    document.querySelector('.tab-btn[data-tab="completed-tab"]').click();
+                }
+            }
+        });
+
+        // Add new booking (simulated)
+        function addNewBooking() {
+            const newId = "WX-2023-" + (100 + Math.floor(Math.random() * 900));
+            const services = ["Basic Wash", "Premium Wash", "Full Detailing"];
+            const prices = ["Nu.150", "Nu.600", "Nu.1200"];
+            const times = ["09:00 - 11:00", "11:00 - 13:00", "14:00 - 16:00", "16:00 - 18:00"];
+            const names = ["Tashi Dorji", "Pema Wangmo", "Sonam Lhamo", "Karma Tenzin"];
+            
+            const randomService = Math.floor(Math.random() * 3);
+            
+            bookings.push({
+                id: newId,
+                customer: names[Math.floor(Math.random() * names.length)],
+                email: "customer" + Math.floor(Math.random() * 100) + "@example.com",
+                vehicle: ["Toyota", "Honda", "Hyundai", "Suzuki"][Math.floor(Math.random() * 4)] + " " + 
+                        ["Hilux", "Civic", "Creta", "Swift"][Math.floor(Math.random() * 4)],
+                plate: "BT-" + (1000 + Math.floor(Math.random() * 9000)),
+                service: services[randomService],
+                price: prices[randomService],
+                time: times[Math.floor(Math.random() * times.length)],
+                status: "pending",
+                phone: "+975 77 " + (100000 + Math.floor(Math.random() * 900000))
+            });
+            
+            renderBookings();
+        }
+
+        // Initial render
+        renderBookings();
+
+        // Simulate new bookings every 30 seconds
+        setInterval(addNewBooking, 30000);
+    </script>
+</body>
+</html>
